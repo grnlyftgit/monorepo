@@ -18,7 +18,7 @@ const validateServiceConfig = (config: ServiceConfig): void => {
     throw new Error("Service name cannot be empty");
   }
   if (!config.url || !config.url.match(/^https?:\/\/.+/)) {
-        throw new Error(`Invalid URL for service ${config.name}`);
+    throw new Error(`Invalid URL for service ${config.name}`);
   }
   if (config.timeout <= 0) {
     throw new Error(`Timeout must be positive for service ${config.name}`);

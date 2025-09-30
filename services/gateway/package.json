@@ -5,13 +5,7 @@
   "scripts": {
     "start": "nodemon",
     "dev": "nodemon",
-    "build": "tsc",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "**/*": [
-      "prettier --write --no-error-on-unmatched-pattern --ignore-unknown"
-    ]
+    "build": "tsc"
   },
   "dependencies": {
     "@repo/service": "workspace:*",
@@ -28,12 +22,8 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
     "@types/http-proxy-middleware": "^0.19.3",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.6",
     "nodemon": "^3.1.10",
     "typescript": "^5.9.2",
-    "ts-node": "^10.9.2",
-    "tsconfig": "^7.0.0",
-    "tsconfig-paths": "^4.2.0"
+    "ts-node": "^10.9.2"
   }
 }
