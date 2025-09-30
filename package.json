@@ -26,9 +26,5 @@
     "node": ">=18"
   },
   "packageManager": "pnpm@10.11.0",
-  "dependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.6"
-  },
   "type": "module"
 }
