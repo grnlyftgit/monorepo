@@ -42,6 +42,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(compressionMiddleware);
 app.use(cookieParserMiddleware({}));
 
+// Error handling middleware
+app.use(errorHandler);
+
 // API routes
 app.get(
   '/',
@@ -52,15 +55,19 @@ app.get(
   })
 );
 
-app.all('/*splat', toNodeHandler(auth)); // Better Auth Route Handler
-
 app.get(
   '/health',
-  healthCheck({ port: PORT, serviceName: `${serviceName}`, version: 'v1' })
+  healthCheck({
+    port: PORT,
+    serviceName: `${authEnvConfig.SERVICE_NAME}`,
+    version: 'v1',
+  })
 );
 
-// Error handling middleware
-app.use(errorHandler);
+
+app.all('/*splat', toNodeHandler(auth)); // Better Auth Route Handler
+
+
 
 app.listen(PORT, () => {
   logger.info(`${serviceName} service is running on port ${PORT}`);

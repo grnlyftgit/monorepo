@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "grnlyft",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
