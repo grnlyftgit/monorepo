@@ -1,13 +1,13 @@
 import express from 'express';
 import type { Express, Request, Response } from 'express';
 import { createCors } from '@repo/service/config/cors';
-import helmet from 'helmet';
 import proxyRoutes from './routes/proxy';
 import { createErrorResponse } from '@repo/service/utils';
 import { handleServerShutdown } from '@repo/service/utils/actions';
 import config from './config/env';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
+import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { createLogger } from '@repo/service/lib/logger';
 
 const logger = createLogger('API Gateway');
@@ -20,7 +20,7 @@ app.set('trust proxy', 1);
 
 // setup middlewares
 app.use(
-  helmet({
+  createHelmetMiddleware({
     crossOriginEmbedderPolicy: false,
   })
 );

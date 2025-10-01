@@ -1,5 +1,4 @@
 import express from 'express';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
 import type { Express } from 'express';
 import authEnvConfig from './config/env';
@@ -12,6 +11,7 @@ import {
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
 import { createCors } from '@repo/service/config/cors';
+import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 
@@ -30,9 +30,12 @@ app.use(
     NODE_ENV: authEnvConfig.NODE_ENV,
   })
 );
+
+// Configure Helmet with proper CSP for Scalar API Reference
 app.use(
-  helmet({
-    contentSecurityPolicy: false,
+  createHelmetMiddleware({
+    enableScalar: true,
+    nodeEnv: authEnvConfig.NODE_ENV,
   })
 );
 
@@ -45,7 +48,7 @@ app.use(cookieParserMiddleware({}));
 // API routes
 app.get('/', rootAccessCheck({ serviceName: `${serviceName}`, port: PORT }));
 
-app.all('/auth/*splat', toNodeHandler(auth)); // Better Auth Route Handler
+app.all('/v1/*splat', toNodeHandler(auth)); // Better Auth Route Handler
 
 app.get(
   '/health',

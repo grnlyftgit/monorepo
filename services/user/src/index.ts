@@ -1,5 +1,4 @@
 import express from 'express';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
 import type { Express } from 'express';
 import userEnvConfig from './config/env';
@@ -11,6 +10,7 @@ import {
 } from '@repo/service/middleware/healthcheck';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
+import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { createCors } from '@repo/service/config/cors';
 
 //load environment variables
@@ -27,7 +27,7 @@ app.use(
   })
 );
 app.use(
-  helmet({
+  createHelmetMiddleware({
     contentSecurityPolicy: false,
   })
 );
