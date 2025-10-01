@@ -277,3 +277,7 @@ packages/database/generated
 
 # Sentry
 .sentryclirc
+
+#Drizzle Kit
+.drizzle/*.json
+.drizzle/*.sqlite
