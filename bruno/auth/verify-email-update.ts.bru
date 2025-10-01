@@ -1,9 +1,18 @@
 meta {
-  name: verify-email-update.ts
+  name: verify-mobile-otp
   type: http
   seq: 1
 }
 
-get {
-  url: 
+post {
+  url: {{gateway}}{{auth}}/phone-number/verify
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "phoneNumber":"+919832800571",
+    "code":"271596"
+  }
 }

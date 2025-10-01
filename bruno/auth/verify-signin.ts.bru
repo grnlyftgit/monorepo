@@ -1,18 +1,17 @@
 meta {
-  name: verify-mobile-signin.ts
+  name: send-email-otp
   type: http
   seq: 1
 }
 
 post {
-  url: {{gateway}}{{auth}}/phone-number/verify
+  url: {{gateway}}{{auth}}/email-otp/send-verification-otp
   body: json
   auth: none
 }
 
 body:json {
   {
-    "phoneNumber": "+919832800571",
-    "code": "878496"
+    "phoneNumber": "mondalsuman97322@gmail.com"
   }
 }

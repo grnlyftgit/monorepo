@@ -4,6 +4,14 @@ meta {
   seq: 1
 }
 
-get {
-  url: 
+post {
+  url: {{gateway}}{{auth}}/phone-number/send-otp
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "phoneNumber":"+919832800571"
+  }
 }

@@ -1,8 +1,7 @@
-import { createErrorResponse } from "./index";
+import { createErrorResponse } from './index';
+import { createLogger } from '../lib/logger';
 
-import { createLogger } from "../lib/logger";
-
-const logger = createLogger("ServiceActions");
+const logger = createLogger('ServiceActions');
 
 export const formatTime = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
@@ -13,10 +12,9 @@ export const formatTime = (seconds: number) => {
 
 export const handleServerShutdown = async () => {
   try {
-    // await disconnectdb();
     logger.info('SERVER SHUTDOWN');
     process.exit(0);
   } catch (error) {
-    createErrorResponse("Error during server shutdown");
+    createErrorResponse('Error during server shutdown');
   }
 };

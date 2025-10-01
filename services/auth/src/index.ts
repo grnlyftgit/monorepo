@@ -11,6 +11,7 @@ import { createCors } from '@repo/service/config/cors';
 import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
+import limiter from '@repo/service/middleware/ratelimiter';
 
 //load environment variables
 dotenv.config();
@@ -44,6 +45,10 @@ app.use(cookieParserMiddleware({}));
 
 // Error handling middleware
 app.use(errorHandler);
+
+
+// Rate Limiter
+app.use(limiter);
 
 // API routes
 app.get(

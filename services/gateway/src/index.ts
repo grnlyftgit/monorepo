@@ -67,6 +67,7 @@ app.use(
 
 (async () => {
   try {
+
     app.listen(PORT, () => {
       logger.info(`API Gateway running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV}`);

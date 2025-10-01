@@ -10,12 +10,12 @@ import { generateUID } from '@repo/service/utils/private/uid-generator';
 import { generateRandomUsername } from '@repo/service/utils';
 import { PasswordUtils } from '@repo/service/utils/private/hash-passowrd';
 import * as schema from '@repo/db-neon/src/db/schema';
+import { passkey } from 'better-auth/plugins/passkey';
 
 const logger = createLogger('BetterAuth');
-
 const isDev = authEnvConfig.NODE_ENV === 'development';
 
-export const auth = betterAuth({
+export const auth: any = betterAuth({
   appName: siteData.name,
   baseURL: authEnvConfig.BETTER_AUTH_URL,
   telemetry: { enabled: false },
@@ -26,6 +26,46 @@ export const auth = betterAuth({
     provider: 'pg',
     schema,
   }),
+
+  // Enable phone number login/signup with OTP
+  plugins: [
+    openAPI({ path: '/docs' }),
+    passkey(),
+    phoneNumber({
+      requireVerification: true,
+      allowedAttempts: 5,
+      otpLength: 6,
+      expiresIn: 600, // 10 min
+      sendOTP: ({ phoneNumber, code }) => {
+        logger.info(`Sending OTP ${code} to phone number ${phoneNumber}`);
+        // TODO: Integrate your SMS gateway here to send OTP
+      },
+      signUpOnVerification: {
+        // On successful phone OTP verification for new user, generate temp email & username
+        getTempEmail: () => {
+          const domain =
+            authEnvConfig.COOKIE_DOMAIN?.replace(/^\./, '') ?? 'example.com';
+          return `${generateRandomUsername()}@${domain}`;
+        },
+        getTempName: () => {
+          return generateRandomUsername();
+        },
+      },
+    }),
+
+    // Email OTP plugin for verification after phone signup/login
+    emailOTP({
+      allowedAttempts: 5,
+      otpLength: 6,
+      expiresIn: 600, // 10 min
+      overrideDefaultEmailVerification: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        logger.info(`Sending email OTP ${otp} to ${email} for type ${type}`);
+        // TODO: Integrate your email service to send email OTP here
+      },
+    }),
+  ],
+
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
@@ -37,6 +77,10 @@ export const auth = betterAuth({
         return await PasswordUtils.verify(password, hash, config.HASH_SECRET);
       },
     },
+  },
+
+  emailVerification: {
+    autoSignInAfterVerification: true,
   },
 
   session: {
@@ -68,57 +112,22 @@ export const auth = betterAuth({
       domain: authEnvConfig.COOKIE_DOMAIN,
     },
   },
-  plugins: [
-    openAPI({
-      path: '/docs',
-    }),
-    phoneNumber({
-      requireVerification: true,
-      sendOTP: ({ phoneNumber, code }, request) => {
-        logger.info(`Sending OTP ${code} to phone number ${phoneNumber}`);
-      },
-      signUpOnVerification: {
-        getTempEmail: () => {
-          const domain = authEnvConfig.COOKIE_DOMAIN?.replace(/^\./, '') ?? '';
-          return `${generateRandomUsername()}@${domain}`;
-        },
-        getTempName: () => {
-          return generateRandomUsername();
-        },
-      },
-    }),
-    emailOTP({
-      allowedAttempts: 5,
-      otpLength: 6,
-      expiresIn: 600, // 10 minutes
-      overrideDefaultEmailVerification: true,
-      async sendVerificationOTP({ email, otp, type }) {
-        if (type === 'sign-in') {
-          logger.info(`Sending OTP ${otp} to email ${email}`);
-
-          //TODO : Integrate real email service
-        } else if (type === 'email-verification') {
-          logger.info(`Sending OTP ${otp} to email ${email}`);
-          //TODO : Integrate real email service
-        } else {
-          logger.info(`Sending OTP ${otp} to email ${email}`);
-          //TODO : Integrate real email service
-        }
-      },
-    }),
-  ],
 
   rateLimit: {
     mode: isDev ? 'TEST' : 'LIVE',
     enabled: true,
     interval: '2m',
     max: 10,
+    customRules: {
+      '/get-session': false,
+    },
   },
 
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
+          // Use custom UID for new users
           return {
             data: {
               ...user,
@@ -133,17 +142,12 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, newEmail, url }, request) => {
-        logger.info(
-          `Sending verification email to ${newEmail} for user ${user.id}: ${url}`
-        );
-        //TODO : Integrate real email service
-      },
     },
     deleteUser: {
       enabled: true,
     },
   },
+
   account: {
     accountLinking: {
       enabled: true,
