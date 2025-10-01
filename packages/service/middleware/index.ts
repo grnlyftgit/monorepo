@@ -1,6 +1,6 @@
-import type { NextFunction, Request, Response } from "express";
-import { logError, ServiceError } from "../types";
-import { createErrorResponse } from "../utils";
+import type { NextFunction, Request, Response } from 'express';
+import { logError, ServiceError } from '../types';
+import { createErrorResponse } from '../utils';
 
 export function errorHandler(
   error: ServiceError,
@@ -17,7 +17,7 @@ export function errorHandler(
   });
 
   const statusCode = error.statusCode || 500;
-  const message = error.message || "Internal Server Error";
+  const message = error.message || 'Internal Server Error';
 
   res.status(statusCode).json(createErrorResponse(message));
 

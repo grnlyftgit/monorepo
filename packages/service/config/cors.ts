@@ -20,12 +20,6 @@ export const createCors = ({ NODE_ENV }: AppCorsProps) => {
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: config.CORS_CREDENTIALS,
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "x-user-id",
-      "x-user-email",
-    ],
   };
 
   return cors(corsOptions);

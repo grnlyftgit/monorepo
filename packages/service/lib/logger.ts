@@ -3,6 +3,7 @@ import DailyRotateFile from "winston-daily-rotate-file";
 import chalk from "chalk";
 import path from "path";
 import fs from "fs";
+import config from "../config/env";
 
 const LOG_LEVELS = {
   error: 0,
@@ -31,7 +32,7 @@ if (!fs.existsSync(logDir)) {
 
 // Optimal log level for production use
 const getLogLevel = (): string => {
-  return "info"; // Best practice: info level for production
+  return 'debug';
 };
 
 class CustomFormatter {

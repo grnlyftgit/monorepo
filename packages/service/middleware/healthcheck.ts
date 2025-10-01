@@ -7,7 +7,7 @@ interface healthCheckMiddlewareProps {
   version?: string;
 }
 
-export const healthCheckMiddleware = ({
+export const healthCheck = ({
   port,
   serviceName,
   version,
