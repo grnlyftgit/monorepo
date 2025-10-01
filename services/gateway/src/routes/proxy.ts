@@ -4,6 +4,7 @@ import {
   getServiceConfig,
   getActiveServices,
   ServiceConfig,
+  SERVICE_DEFINITIONS,
 } from '../config/services';
 import { createLogger } from '@repo/service/lib/logger';
 import type { Router as RouterType } from 'express';
@@ -13,11 +14,87 @@ import config from '../config/env';
 const router: RouterType = Router();
 const logger = createLogger('ProxyRouter');
 
+// ============================================
+// Types & Interfaces
+// ============================================
+
 interface ProxyOptions {
   serviceName: string;
   pathPrefix: string;
-  pathRewrite?: string;
+  pathRewrite: string;
 }
+
+// ============================================
+// Middleware Functions
+// ============================================
+
+const requestTimer = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
+  (req as any).startTime = Date.now();
+  next();
+};
+
+const rootRedirectMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.path === '/') {
+    logger.info('Root path accessed');
+    res.json({
+      success: true,
+      message: 'Welcome to the API Gateway',
+      version: '1.0.0',
+      environment: config.NODE_ENV,
+      timestamp: new Date().toISOString(),
+    });
+  }
+  next();
+};
+
+const healthCheckMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.path === '/health') {
+    const services = getActiveServices().map((s) => ({
+      name: s.name,
+      displayName: s.displayName,
+      url: s.url,
+      proxyPath: s.proxyPath,
+      enabled: s.enabled,
+    }));
+
+    const uptime = formatTime(process.uptime());
+
+    res.json({
+      success: true,
+      status: 'healthy',
+      uptime,
+      timestamp: new Date().toISOString(),
+      environment: config.NODE_ENV,
+      gateway: {
+        name: 'API Gateway',
+        port: config.PORT,
+        version: '1.0.0',
+      },
+      services: {
+        total: services.length,
+        active: services.filter((s) => s.enabled).length,
+        list: services,
+      },
+    });
+  }
+  next();
+};
+
+// ============================================
+// Error Handling
+// ============================================
 
 const handleProxyError = (
   err: any,
@@ -25,56 +102,80 @@ const handleProxyError = (
   res: Response,
   serviceName?: string
 ): void => {
+  const statusCode = err.statusCode || 503;
+  const errorCode = (err as any)?.code;
+
   logger.error(`Proxy error for service: ${serviceName || 'unknown'}`, {
     error: err.message,
-    code: (err as any)?.code,
+    code: errorCode,
     method: req.method,
     path: req.originalUrl,
     service: serviceName,
-    statusCode: err.statusCode || 503,
+    statusCode,
   });
 
   if (!res.headersSent) {
-    const statusCode = err.statusCode || 503;
     res.status(statusCode).json({
       success: false,
-      error: 'Service unavailable',
-      message:
-        'The requested service is temporarily unavailable. Please try again later.',
+      error: 'Service Unavailable',
+      message: getErrorMessage(errorCode),
       service: serviceName,
       timestamp: new Date().toISOString(),
     });
   }
 };
 
+const getErrorMessage = (code?: string): string => {
+  const errorMessages: Record<string, string> = {
+    ECONNREFUSED: 'Service is not responding. Please try again later.',
+    ETIMEDOUT: 'Service request timed out. Please try again.',
+    ENOTFOUND: 'Service could not be found.',
+    ECONNRESET: 'Connection to service was reset.',
+  };
+
+  return (
+    errorMessages[code || ''] ||
+    'The requested service is temporarily unavailable. Please try again later.'
+  );
+};
+
+// ============================================
+// Proxy Creation
+// ============================================
+
 const createServiceProxy = (
-  config: ServiceConfig,
-  pathRewrite?: Record<string, string>
+  serviceConfig: ServiceConfig,
+  pathRewrite: Record<string, string>
 ) => {
   const options: Options = {
-    target: config.url,
+    target: serviceConfig.url,
     changeOrigin: true,
-    pathRewrite: pathRewrite || {},
-    timeout: config.timeout || 30000,
-    proxyTimeout: config.timeout || 30000,
+    pathRewrite,
+    timeout: serviceConfig.timeout,
+    proxyTimeout: serviceConfig.timeout,
     logLevel: 'silent',
 
     onError: (err, req, res) => {
       logger.error(`Proxy error occurred`, {
-        service: config.name,
+        service: serviceConfig.name,
         error: err.message,
         code: (err as any)?.code,
-        target: config.url,
+        target: serviceConfig.url,
       });
-      handleProxyError(err, req as Request, res as Response, config.name);
+      handleProxyError(
+        err,
+        req as Request,
+        res as Response,
+        serviceConfig.displayName
+      );
     },
 
     onProxyReq: (proxyReq, req: Request) => {
-      logger.http(`Proxying request to ${config.name}`, {
+      logger.http(`Proxying request to ${serviceConfig.displayName}`, {
         method: req.method,
         path: req.originalUrl,
-        target: config.url,
-        service: config.name,
+        target: serviceConfig.url,
+        service: serviceConfig.name,
         ip: req.ip || req.socket?.remoteAddress,
       });
 
@@ -89,7 +190,7 @@ const createServiceProxy = (
         proxyReq.write(bodyData);
 
         logger.debug(`Request body forwarded`, {
-          service: config.name,
+          service: serviceConfig.name,
           method: req.method,
           bodySize: Buffer.byteLength(bodyData),
         });
@@ -103,18 +204,18 @@ const createServiceProxy = (
       const logLevel =
         statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
 
-      logger[logLevel](`Response from ${config.name}`, {
+      logger[logLevel](`Response from ${serviceConfig.displayName}`, {
         status: statusCode,
         method: req.method,
         path: req.originalUrl,
         duration: `${duration}ms`,
-        service: config.name,
+        service: serviceConfig.name,
         contentType: proxyRes.headers['content-type'],
       });
 
       // Add custom headers
       proxyRes.headers['X-Proxied-By'] = 'API-Gateway';
-      proxyRes.headers['X-Service-Name'] = config.name;
+      proxyRes.headers['X-Service-Name'] = serviceConfig.name;
       proxyRes.headers['X-Response-Time'] = `${duration}ms`;
     },
   };
@@ -122,54 +223,15 @@ const createServiceProxy = (
   return createProxyMiddleware(options);
 };
 
-const requestTimer = (req: Request, res: Response, next: NextFunction) => {
-  (req as any).startTime = Date.now();
-  next();
-};
-
-// Root redirect middleware
-const rootRedirectMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.path === '/') {
-    logger.info('Root path accessed, redirecting to website');
-    return res.redirect(config.WEBSITE_URL);
-  }
-  next();
-};
-
-const healthCheckMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.path === '/health') {
-    const services = getActiveServices().map((s) => ({
-      name: s.name,
-      url: s.url,
-      enabled: s.enabled,
-    }));
-    const uptime = formatTime(process.uptime());
-
-    return res.json({
-      success: true,
-      status: 'healthy',
-      uptime,
-      timestamp: new Date().toISOString(),
-      gateway: `API Gateway - PORT: ${config.PORT}`,
-      services,
-    });
-  }
-  next();
-};
+// ============================================
+// Service Registration
+// ============================================
 
 const registerServiceProxy = ({
   serviceName,
   pathPrefix,
   pathRewrite,
-}: ProxyOptions) => {
+}: ProxyOptions): void => {
   const serviceConfig = getServiceConfig(serviceName);
 
   if (!serviceConfig) {
@@ -180,7 +242,7 @@ const registerServiceProxy = ({
     return;
   }
 
-  if (serviceConfig.enabled === false) {
+  if (!serviceConfig.enabled) {
     logger.info(`Service is disabled, skipping proxy registration`, {
       serviceName,
       pathPrefix,
@@ -188,69 +250,72 @@ const registerServiceProxy = ({
     return;
   }
 
-  const rewriteRule = pathRewrite
-    ? { [`^${pathPrefix}`]: pathRewrite }
-    : { [`^${pathPrefix}`]: '' };
+  const rewriteRule = { [`^${pathPrefix}`]: pathRewrite };
 
-  const middlewares: any[] = [
+  const middlewares = [
     requestTimer,
     createServiceProxy(serviceConfig, rewriteRule),
   ];
 
   router.use(pathPrefix, ...middlewares);
+
+  logger.debug(`Service proxy registered`, {
+    service: serviceName,
+    pathPrefix,
+    target: serviceConfig.url,
+  });
 };
 
-// Root redirect
-router.use(rootRedirectMiddleware);
+// ============================================
+// Route Registration
+// ============================================
 
-// Health check middleware
+// Root and health check routes
+router.use(rootRedirectMiddleware);
 router.use(healthCheckMiddleware);
 
-// Service routes configuration
-const serviceRoutes: ProxyOptions[] = [
-  {
-    serviceName: 'auth',
-    pathPrefix: '/api/auth',
-    pathRewrite: '/',
-  },
-  {
-    serviceName: 'user',
-    pathPrefix: '/api/user',
-    pathRewrite: '/',
-  }
-];
+// Build service routes from definitions
+const serviceRoutes: ProxyOptions[] = Object.values(SERVICE_DEFINITIONS).map(
+  (def) => ({
+    serviceName: def.key,
+    pathPrefix: def.proxyPath,
+    pathRewrite: def.servicePath,
+  })
+);
 
 // Register all service proxies
 serviceRoutes.forEach(registerServiceProxy);
 
-// Log once after all services are registered
+// Log initialization
 logger.info(`API Gateway initialized successfully`, {
   totalServices: serviceRoutes.length,
   registeredServices: serviceRoutes.map((s) => s.serviceName),
+  environment: config.NODE_ENV,
   port: config.PORT,
 });
 
+// ============================================
+// Error Handlers
+// ============================================
+
 // 404 handler for undefined routes
 router.use((req: Request, res: Response) => {
-  logger.warn(
-    `Route not found: ${req.method} ${req.originalUrl}`
-
-    //   , {
-    //   ip: req.ip || req.socket?.remoteAddress,
-    // }
-  );
+  logger.warn(`Route not found: ${req.method} ${req.originalUrl}`, {
+    ip: req.ip || req.socket?.remoteAddress,
+  });
 
   res.status(404).json({
     success: false,
     error: 'Not Found',
     message: 'The requested endpoint does not exist',
     path: req.originalUrl,
+    availableRoutes: serviceRoutes.map((s) => s.pathPrefix),
     timestamp: new Date().toISOString(),
   });
 });
 
-// Global error handler for router
-router.use((err: any, req: Request, res: Response, next: NextFunction) => {
+// Global error handler
+router.use((err: any, req: Request, res: Response, _next: NextFunction) => {
   logger.error(`Unhandled error in proxy router`, {
     error: err.message,
     stack: err.stack,
@@ -262,7 +327,10 @@ router.use((err: any, req: Request, res: Response, next: NextFunction) => {
     res.status(err.statusCode || 500).json({
       success: false,
       error: 'Internal Server Error',
-      message: err.message || 'An unexpected error occurred',
+      message:
+        config.NODE_ENV === 'production'
+          ? 'An unexpected error occurred'
+          : err.message,
       timestamp: new Date().toISOString(),
     });
   }

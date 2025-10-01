@@ -1,10 +1,6 @@
 import { Request, Response } from 'express';
 import { formatTime } from '../utils/actions';
 
-interface rootAccessMiddlewareProps {
-  serviceName: string;
-  port: number;
-}
 
 interface healthCheckMiddlewareProps {
   port: number;
@@ -12,20 +8,6 @@ interface healthCheckMiddlewareProps {
   version?: string;
 }
 
-export const rootAccessCheck = ({
-  serviceName,
-  port,
-}: rootAccessMiddlewareProps) => {
-  return (_: Request, res: Response) => {
-    return res.json({
-      success: true,
-      message: `Welcome to ${serviceName} Service!`,
-      serviceName,
-      port,
-      timestamp: new Date().toISOString(),
-    });
-  };
-};
 
 export const healthCheck = ({
   port,

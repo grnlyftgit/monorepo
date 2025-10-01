@@ -3,11 +3,8 @@ import dotenv from 'dotenv';
 import type { Express } from 'express';
 import authEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
-import { errorHandler } from '@repo/service/middleware';
-import {
-  healthCheck,
-  rootAccessCheck,
-} from '@repo/service/middleware/healthcheck';
+import { errorHandler, rootAccessCheck } from '@repo/service/middleware';
+import { healthCheck } from '@repo/service/middleware/healthcheck';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
 import { createCors } from '@repo/service/config/cors';
@@ -46,9 +43,16 @@ app.use(compressionMiddleware);
 app.use(cookieParserMiddleware({}));
 
 // API routes
-app.get('/', rootAccessCheck({ serviceName: `${serviceName}`, port: PORT }));
+app.get(
+  '/',
+  rootAccessCheck({
+    serviceName: `${serviceName}`,
+    port: PORT,
+    docs: '/docs',
+  })
+);
 
-app.all('/v1/*splat', toNodeHandler(auth)); // Better Auth Route Handler
+app.all('/*splat', toNodeHandler(auth)); // Better Auth Route Handler
 
 app.get(
   '/health',

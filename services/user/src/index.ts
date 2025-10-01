@@ -3,10 +3,9 @@ import dotenv from 'dotenv';
 import type { Express } from 'express';
 import userEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
-import { errorHandler } from '@repo/service/middleware';
+import { errorHandler , rootAccessCheck} from '@repo/service/middleware';
 import {
   healthCheck,
-  rootAccessCheck,
 } from '@repo/service/middleware/healthcheck';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';

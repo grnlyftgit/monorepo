@@ -2,6 +2,12 @@ import type { NextFunction, Request, Response } from 'express';
 import { logError, ServiceError } from '../types';
 import { createErrorResponse } from '../utils';
 
+interface rootAccessMiddlewareProps {
+  serviceName: string;
+  port: number;
+  docs?: string;
+}
+
 export function errorHandler(
   error: ServiceError,
   req: Request,
@@ -23,3 +29,20 @@ export function errorHandler(
 
   next();
 }
+
+export const rootAccessCheck = ({
+  serviceName,
+  port,
+  docs,
+}: rootAccessMiddlewareProps) => {
+  return (_: Request, res: Response) => {
+    return res.json({
+      success: true,
+      message: `Welcome to ${serviceName} Service!`,
+      serviceName,
+      port,
+      docs,
+      timestamp: new Date().toISOString(),
+    });
+  };
+};
