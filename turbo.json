@@ -10,10 +10,7 @@
         ".next/**",
         "!.next/cache/**",
         ".basehub/**",
-        "**/generated/**",
-        "packages/auth-service/dist/**",
-        "packages/gateway/dist/**",
-        "packages/user-service/dist/**"
+        "**/generated/**"
       ]
     },
     "test": {
