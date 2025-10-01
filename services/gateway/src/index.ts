@@ -7,6 +7,7 @@ import { handleServerShutdown } from '@repo/service/utils/actions';
 import config from './config/env';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
+import limiter from '@repo/service/middleware/ratelimiter';
 import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { createLogger } from '@repo/service/lib/logger';
 
@@ -34,6 +35,10 @@ app.use(
 // parse JSON bodies
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Apply rate limiting to all requests
+app.use(limiter);
+
 
 // cookieParser is used to parse cookies attached to the client request object.
 // compression is used to gzip responses, reducing bandwidth usage and improving performance.
