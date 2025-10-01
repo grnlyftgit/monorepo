@@ -1,25 +1,25 @@
 {
-  "name": "@repo/gateway",
+  "name": "@repo/user-service",
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
     "start": "nodemon",
     "dev": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "auth:generate": "npx @better-auth/cli generate --config ./src/lib/auth.ts --output ../../packages/db/neon/src/db/auth-schema.ts"
   },
   "dependencies": {
     "@repo/service": "workspace:*",
+    "@repo/db-neon": "workspace:*",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "helmet": "^8.1.0",
-    "http-proxy-middleware": "^2.0.6"
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/express": "^5.0.3",
-    "@types/http-proxy-middleware": "^0.19.3",
     "nodemon": "^3.1.10",
-    "typescript": "^5.9.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }

@@ -2,7 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import type { Express } from 'express';
-import authEnvConfig from './config/env';
+import userEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
 import { errorHandler } from '@repo/service/middleware';
 import {
@@ -12,22 +12,18 @@ import {
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
 import { createCors } from '@repo/service/config/cors';
-import { toNodeHandler } from 'better-auth/node';
-import { auth } from './lib/auth';
 
 //load environment variables
 dotenv.config();
 
 const app: Express = express();
-const PORT = authEnvConfig.PORT;
-const logger = createLogger('Auth Service');
-
-const serviceName = authEnvConfig.SERVICE_NAME;
+const PORT = userEnvConfig.PORT;
+const logger = createLogger(`${userEnvConfig.SERVICE_NAME} Service`);
 
 // setup middlewares
 app.use(
   createCors({
-    NODE_ENV: authEnvConfig.NODE_ENV,
+    NODE_ENV: userEnvConfig.NODE_ENV,
   })
 );
 app.use(
@@ -43,20 +39,27 @@ app.use(compressionMiddleware);
 app.use(cookieParserMiddleware({}));
 
 // API routes
-app.get('/', rootAccessCheck({ serviceName: `${serviceName}`, port: PORT }));
-
-app.all('/auth/*splat', toNodeHandler(auth)); // Better Auth Route Handler
+app.get(
+  '/',
+  rootAccessCheck({ serviceName: `${userEnvConfig.SERVICE_NAME}`, port: PORT })
+);
 
 app.get(
   '/health',
-  healthCheck({ port: PORT, serviceName: `${serviceName}`, version: 'v1' })
+  healthCheck({
+    port: PORT,
+    serviceName: `${userEnvConfig.SERVICE_NAME}`,
+    version: 'v1',
+  })
 );
 
 // Error handling middleware
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  logger.info(`${serviceName} service is running on port ${PORT}`);
+  logger.info(
+    `${userEnvConfig.SERVICE_NAME} service is running on port ${PORT}`
+  );
   logger.info(`Environment: ${process.env.NODE_ENV}`);
   logger.info(`Health check: http://localhost:${PORT}/health`);
 });

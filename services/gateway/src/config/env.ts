@@ -11,6 +11,7 @@ interface AppConfig {
   WEBSITE_URL: string;
   // Microservices service urls
   AUTH_SERVICE_URL: string;
+  USER_SERVICE_URL: string;
 }
 
 const config: AppConfig = {
@@ -21,6 +22,7 @@ const config: AppConfig = {
 
   WEBSITE_URL: process.env.WEBSITE_URL!,
   AUTH_SERVICE_URL: process.env.AUTH_SERVICE_URL!,
+  USER_SERVICE_URL: process.env.USER_SERVICE_URL!,
 };
 
 export default config;

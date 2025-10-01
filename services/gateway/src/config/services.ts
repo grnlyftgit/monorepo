@@ -54,6 +54,11 @@ export const servicesConfig: ServicesConfig = {
     config.AUTH_SERVICE_URL,
     "http://localhost:6001"
   ),
+  user: createServiceConfig(
+    "User Service",
+    config.USER_SERVICE_URL,
+    "http://localhost:6002"
+  ),
 } as const;
 
 export const getServiceConfig = (

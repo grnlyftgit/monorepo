@@ -436,9 +436,6 @@ importers:
 
   services/auth:
     dependencies:
-      '@neondatabase/serverless':
-        specifier: ^1.0.2
-        version: 1.0.2
       '@repo/db-neon':
         specifier: workspace:*
         version: link:../../db/neon
@@ -501,6 +498,40 @@ importers:
       '@types/http-proxy-middleware':
         specifier: ^0.19.3
         version: 0.19.3
+      nodemon:
+        specifier: ^3.1.10
+        version: 3.1.10
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.6.0)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
+  services/user:
+    dependencies:
+      '@repo/db-neon':
+        specifier: workspace:*
+        version: link:../../db/neon
+      '@repo/service':
+        specifier: workspace:*
+        version: link:../../packages/service
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      express:
+        specifier: ^5.1.0
+        version: 5.1.0
+      helmet:
+        specifier: ^8.1.0
+        version: 8.1.0
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/express':
+        specifier: ^5.0.3
+        version: 5.0.3
       nodemon:
         specifier: ^3.1.10
         version: 3.1.10

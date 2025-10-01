@@ -10,13 +10,9 @@ interface EnvConfig {
   PORT: number;
   // Clients urls
   WEBSITE_URL: string;
-
-  //Better Auth Config
-  BETTER_AUTH_SECRET: string;
-  BETTER_AUTH_URL: string;
 }
 
-const authEnvConfig: EnvConfig = {
+const userEnvConfig: EnvConfig = {
   SERVICE_NAME: process.env.SERVICE_NAME!,
   NODE_ENV: (process.env.NODE_ENV === 'production'
     ? 'production'
@@ -24,8 +20,6 @@ const authEnvConfig: EnvConfig = {
   PORT: Number(process.env.PORT)!,
 
   WEBSITE_URL: process.env.WEBSITE_URL!,
-  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
-  BETTER_AUTH_URL: process.env.BETTER_AUTH_URL!,
 };
 
-export default authEnvConfig;
+export default userEnvConfig;

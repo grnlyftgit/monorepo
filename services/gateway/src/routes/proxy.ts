@@ -1,17 +1,17 @@
-import { Router, Request, Response, NextFunction } from "express";
-import { createProxyMiddleware, Options } from "http-proxy-middleware";
+import { Router, Request, Response, NextFunction } from 'express';
+import { createProxyMiddleware, Options } from 'http-proxy-middleware';
 import {
   getServiceConfig,
   getActiveServices,
   ServiceConfig,
-} from "../config/services";
-import { createLogger } from "@repo/service/lib/logger";
-import type { Router as RouterType } from "express";
-import { formatTime } from "@repo/service/utils/actions";
-import config from "../config/env";
+} from '../config/services';
+import { createLogger } from '@repo/service/lib/logger';
+import type { Router as RouterType } from 'express';
+import { formatTime } from '@repo/service/utils/actions';
+import config from '../config/env';
 
 const router: RouterType = Router();
-const logger = createLogger("ProxyRouter");
+const logger = createLogger('ProxyRouter');
 
 interface ProxyOptions {
   serviceName: string;
@@ -25,7 +25,7 @@ const handleProxyError = (
   res: Response,
   serviceName?: string
 ): void => {
-  logger.error(`Proxy error for service: ${serviceName || "unknown"}`, {
+  logger.error(`Proxy error for service: ${serviceName || 'unknown'}`, {
     error: err.message,
     code: (err as any)?.code,
     method: req.method,
@@ -38,9 +38,9 @@ const handleProxyError = (
     const statusCode = err.statusCode || 503;
     res.status(statusCode).json({
       success: false,
-      error: "Service unavailable",
+      error: 'Service unavailable',
       message:
-        "The requested service is temporarily unavailable. Please try again later.",
+        'The requested service is temporarily unavailable. Please try again later.',
       service: serviceName,
       timestamp: new Date().toISOString(),
     });
@@ -57,7 +57,7 @@ const createServiceProxy = (
     pathRewrite: pathRewrite || {},
     timeout: config.timeout || 30000,
     proxyTimeout: config.timeout || 30000,
-    logLevel: "silent",
+    logLevel: 'silent',
 
     onError: (err, req, res) => {
       logger.error(`Proxy error occurred`, {
@@ -79,11 +79,11 @@ const createServiceProxy = (
       });
 
       // Handle request body for POST/PUT/PATCH
-      if (req.body && ["POST", "PUT", "PATCH"].includes(req.method)) {
+      if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
         const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader("Content-Type", "application/json");
+        proxyReq.setHeader('Content-Type', 'application/json');
         proxyReq.setHeader(
-          "Content-Length",
+          'Content-Length',
           Buffer.byteLength(bodyData).toString()
         );
         proxyReq.write(bodyData);
@@ -101,7 +101,7 @@ const createServiceProxy = (
       const statusCode = proxyRes.statusCode || 0;
 
       const logLevel =
-        statusCode >= 500 ? "error" : statusCode >= 400 ? "warn" : "info";
+        statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
 
       logger[logLevel](`Response from ${config.name}`, {
         status: statusCode,
@@ -109,13 +109,13 @@ const createServiceProxy = (
         path: req.originalUrl,
         duration: `${duration}ms`,
         service: config.name,
-        contentType: proxyRes.headers["content-type"],
+        contentType: proxyRes.headers['content-type'],
       });
 
       // Add custom headers
-      proxyRes.headers["X-Proxied-By"] = "API-Gateway";
-      proxyRes.headers["X-Service-Name"] = config.name;
-      proxyRes.headers["X-Response-Time"] = `${duration}ms`;
+      proxyRes.headers['X-Proxied-By'] = 'API-Gateway';
+      proxyRes.headers['X-Service-Name'] = config.name;
+      proxyRes.headers['X-Response-Time'] = `${duration}ms`;
     },
   };
 
@@ -133,8 +133,8 @@ const rootRedirectMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.path === "/") {
-    logger.info("Root path accessed, redirecting to website");
+  if (req.path === '/') {
+    logger.info('Root path accessed, redirecting to website');
     return res.redirect(config.WEBSITE_URL);
   }
   next();
@@ -145,7 +145,7 @@ const healthCheckMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.path === "/health") {
+  if (req.path === '/health') {
     const services = getActiveServices().map((s) => ({
       name: s.name,
       url: s.url,
@@ -155,7 +155,7 @@ const healthCheckMiddleware = (
 
     return res.json({
       success: true,
-      status: "healthy",
+      status: 'healthy',
       uptime,
       timestamp: new Date().toISOString(),
       gateway: `API Gateway - PORT: ${config.PORT}`,
@@ -190,7 +190,7 @@ const registerServiceProxy = ({
 
   const rewriteRule = pathRewrite
     ? { [`^${pathPrefix}`]: pathRewrite }
-    : { [`^${pathPrefix}`]: "" };
+    : { [`^${pathPrefix}`]: '' };
 
   const middlewares: any[] = [
     requestTimer,
@@ -209,13 +209,15 @@ router.use(healthCheckMiddleware);
 // Service routes configuration
 const serviceRoutes: ProxyOptions[] = [
   {
-    serviceName: "auth",
-    pathPrefix: "/api/auth",
-    pathRewrite: "/auth",
+    serviceName: 'auth',
+    pathPrefix: '/api/auth',
+    pathRewrite: '/',
   },
-  // Add more service routes here
-  // { serviceName: "user", pathPrefix: "/api/users", pathRewrite: "/users" },
-  // { serviceName: "organization", pathPrefix: "/api/orgs", pathRewrite: "/orgs" },
+  {
+    serviceName: 'user',
+    pathPrefix: '/api/user',
+    pathRewrite: '/',
+  }
 ];
 
 // Register all service proxies
@@ -240,8 +242,8 @@ router.use((req: Request, res: Response) => {
 
   res.status(404).json({
     success: false,
-    error: "Not Found",
-    message: "The requested endpoint does not exist",
+    error: 'Not Found',
+    message: 'The requested endpoint does not exist',
     path: req.originalUrl,
     timestamp: new Date().toISOString(),
   });
@@ -259,8 +261,8 @@ router.use((err: any, req: Request, res: Response, next: NextFunction) => {
   if (!res.headersSent) {
     res.status(err.statusCode || 500).json({
       success: false,
-      error: "Internal Server Error",
-      message: err.message || "An unexpected error occurred",
+      error: 'Internal Server Error',
+      message: err.message || 'An unexpected error occurred',
       timestamp: new Date().toISOString(),
     });
   }

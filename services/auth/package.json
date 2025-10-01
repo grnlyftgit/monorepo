@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "nodemon --exec \"npx ts-node --transpile-only src/index.ts\"",
-    "dev": "nodemon --exec \"npx ts-node --transpile-only src/index.ts\"",
+    "start": "nodemon",
+    "dev": "nodemon",
     "build": "tsc",
     "auth:generate": "npx @better-auth/cli generate --config ./src/lib/auth.ts --output ../../packages/db/neon/src/db/auth-schema.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
     "@repo/service": "workspace:*",
     "@repo/db-neon": "workspace:*",
     "better-auth": "^1.3.24",
