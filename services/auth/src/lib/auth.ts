@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import db from '@repo/db-neon/src';
+import { neonDB } from '@repo/db-neon/src';
 import authEnvConfig from '../config/env';
 import { emailOTP, openAPI, phoneNumber } from 'better-auth/plugins';
 import { siteData } from '@repo/seo/metadata';
@@ -10,7 +10,6 @@ import { generateUID } from '@repo/service/utils/private/uid-generator';
 import { generateRandomUsername } from '@repo/service/utils';
 import { PasswordUtils } from '@repo/service/utils/private/hash-passowrd';
 import * as schema from '@repo/db-neon/src/db/schema';
-import { passkey } from 'better-auth/plugins/passkey';
 
 const logger = createLogger('BetterAuth');
 const isDev = authEnvConfig.NODE_ENV === 'development';
@@ -22,7 +21,7 @@ export const auth: any = betterAuth({
   basePath: '/',
   secret: authEnvConfig.BETTER_AUTH_SECRET,
   trustedOrigins: config.CORS_WHITELISTED_ORIGINS,
-  database: drizzleAdapter(db, {
+  database: drizzleAdapter(neonDB, {
     provider: 'pg',
     schema,
   }),
@@ -30,7 +29,6 @@ export const auth: any = betterAuth({
   // Enable phone number login/signup with OTP
   plugins: [
     openAPI({ path: '/docs' }),
-    passkey(),
     phoneNumber({
       requireVerification: true,
       allowedAttempts: 5,
@@ -77,10 +75,6 @@ export const auth: any = betterAuth({
         return await PasswordUtils.verify(password, hash, config.HASH_SECRET);
       },
     },
-  },
-
-  emailVerification: {
-    autoSignInAfterVerification: true,
   },
 
   session: {
