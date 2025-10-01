@@ -5,11 +5,7 @@ meta {
 }
 
 get {
-  url: http://localhost:6001/health
+  url: {{gateway}}/api/auth
   body: none
   auth: inherit
-}
-
-settings {
-  encodeUrl: true
 }

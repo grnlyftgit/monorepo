@@ -1,0 +1,18 @@
+meta {
+  name: verify-mobile-signin.ts
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{gateway}}{{auth}}/phone-number/verify
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "phoneNumber": "+919832800571",
+    "code": "878496"
+  }
+}

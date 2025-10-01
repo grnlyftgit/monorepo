@@ -231,6 +231,9 @@ importers:
       express-rate-limit:
         specifier: ^8.1.0
         version: 8.1.0(express@5.1.0)
+      friendlier-words:
+        specifier: ^1.1.3
+        version: 1.1.3
       helmet:
         specifier: ^8.1.0
         version: 8.1.0
@@ -3655,6 +3658,9 @@ packages:
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
+
+  friendlier-words@1.1.3:
+    resolution: {integrity: sha512-OVYGHh7UETIonK8WWplE0BFQTJGwI+i4GOESuA/wXchTGUBPFtb9AYuJwYGvcNY1YDRE3um4HezKdozvo2PUmw==}
 
   fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
@@ -8653,6 +8659,8 @@ snapshots:
   framework-utils@1.1.0: {}
 
   fresh@2.0.0: {}
+
+  friendlier-words@1.1.3: {}
 
   fs-extra@10.1.0:
     dependencies:

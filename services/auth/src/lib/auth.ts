@@ -7,7 +7,9 @@ import { siteData } from '@repo/seo/metadata';
 import config from '@repo/service/config/env';
 import { createLogger } from '@repo/service/lib/logger';
 import { generateUID } from '@repo/service/utils/private/uid-generator';
+import { generateRandomUsername } from '@repo/service/utils';
 import { PasswordUtils } from '@repo/service/utils/private/hash-passowrd';
+import * as schema from '@repo/db-neon/src/db/schema';
 
 const logger = createLogger('BetterAuth');
 
@@ -22,6 +24,7 @@ export const auth = betterAuth({
   trustedOrigins: config.CORS_WHITELISTED_ORIGINS,
   database: drizzleAdapter(db, {
     provider: 'pg',
+    schema,
   }),
   emailAndPassword: {
     enabled: true,
@@ -70,19 +73,25 @@ export const auth = betterAuth({
       path: '/docs',
     }),
     phoneNumber({
+      requireVerification: true,
       sendOTP: ({ phoneNumber, code }, request) => {
         logger.info(`Sending OTP ${code} to phone number ${phoneNumber}`);
       },
       signUpOnVerification: {
-        getTempEmail: (phoneNumber) => {
-          return `${phoneNumber}@my-site.com`;
+        getTempEmail: () => {
+          const domain = authEnvConfig.COOKIE_DOMAIN?.replace(/^\./, '') ?? '';
+          return `${generateRandomUsername()}@${domain}`;
         },
-        getTempName: (phoneNumber) => {
-          return phoneNumber;
+        getTempName: () => {
+          return generateRandomUsername();
         },
       },
     }),
     emailOTP({
+      allowedAttempts: 5,
+      otpLength: 6,
+      expiresIn: 600, // 10 minutes
+      overrideDefaultEmailVerification: true,
       async sendVerificationOTP({ email, otp, type }) {
         if (type === 'sign-in') {
           logger.info(`Sending OTP ${otp} to email ${email}`);
@@ -118,6 +127,28 @@ export const auth = betterAuth({
           };
         },
       },
+    },
+  },
+
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }, request) => {
+        logger.info(
+          `Sending verification email to ${newEmail} for user ${user.id}: ${url}`
+        );
+        //TODO : Integrate real email service
+      },
+    },
+    deleteUser: {
+      enabled: true,
+    },
+  },
+  account: {
+    accountLinking: {
+      enabled: true,
+      allowDifferentEmails: true,
+      trustedProviders: ['google', 'facebook'],
     },
   },
 });

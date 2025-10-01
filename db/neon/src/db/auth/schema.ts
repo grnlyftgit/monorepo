@@ -9,7 +9,7 @@ export const user = pgTable('user', {
   image: text('image'),
 
   role: userRoles('role').default('USER').notNull(),
-  phoneNumber: text('phone_number'),
+  phoneNumber: text('phone_number').unique(),
   phoneNumberVerified: boolean('phone_number_verified'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
