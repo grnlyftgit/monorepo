@@ -1,20 +1,19 @@
 import merge from 'lodash.merge';
 import type { Metadata } from 'next';
 
-
 type MetadataGenerator = Omit<Metadata, 'description' | 'title'> & {
   title: string;
   description: string;
   image?: string;
 };
 
-const applicationName = 'Hisaab Sathi';
+const applicationName = 'GrnLyft';
 const author: Metadata['authors'] = {
-  name: 'Hisaab Sathi',
-  url: 'https://hisaabsathi.com/',
+  name: 'GrnLyft',
+  url: 'https://grnlyft.com/',
 };
-const publisher = 'Hisaab Sathi';
-const twitterHandle = '@hissabsathi';
+const publisher = 'GrnLyft';
+const twitterHandle = '@grnlyft';
 const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 const productionUrl = process.env.PROJECT_PRODUCTION_URL;
 
@@ -70,4 +69,12 @@ export const createMetadata = ({
   }
 
   return metadata;
+};
+
+export const siteData = {
+  name: applicationName,
+  url: productionUrl && `${protocol}://${productionUrl}`,
+  author,
+  publisher,
+  twitterHandle,
 };
