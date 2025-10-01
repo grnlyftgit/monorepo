@@ -5,8 +5,7 @@
   "scripts": {
     "start": "nodemon",
     "dev": "nodemon",
-    "build": "tsc",
-    "auth:generate": "npx @better-auth/cli generate --config ./src/lib/auth.ts --output ../../packages/db/neon/src/db/auth-schema.ts"
+    "build": "tsc"
   },
   "dependencies": {
     "@repo/service": "workspace:*",

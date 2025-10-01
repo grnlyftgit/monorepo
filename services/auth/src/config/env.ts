@@ -11,6 +11,9 @@ interface EnvConfig {
   // Clients urls
   WEBSITE_URL: string;
 
+  //Cookie Config
+  COOKIE_DOMAIN: string;
+
   //Better Auth Config
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
@@ -22,6 +25,7 @@ const authEnvConfig: EnvConfig = {
     ? 'production'
     : 'development') as NodeEnv,
   PORT: Number(process.env.PORT)!,
+  COOKIE_DOMAIN: process.env.COOKIE_DOMAIN!,
 
   WEBSITE_URL: process.env.WEBSITE_URL!,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,

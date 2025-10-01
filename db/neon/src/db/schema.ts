@@ -1,3 +1,4 @@
 
 // Central export for all schema definitions
-export * from "./auth-schema";
+export * from "./enums";
+export * from "./auth/schema";

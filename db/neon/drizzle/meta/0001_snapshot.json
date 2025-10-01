@@ -1,6 +1,6 @@
 {
-  "id": "60bb417b-3370-4870-a1fb-9eea1bd9266b",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4246ff22-d949-47b1-9de8-ed0290068087",
+  "prevId": "3a4c0d70-812d-4144-84a3-89b0b8dbabde",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -229,6 +229,26 @@
           "primaryKey": false,
           "notNull": false
         },
+        "role": {
+          "name": "role",
+          "type": "userRoles",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'USER'"
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_number_verified": {
+          "name": "phone_number_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -312,7 +332,23 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.userRoles": {
+      "name": "userRoles",
+      "schema": "public",
+      "values": [
+        "SUPERADMIN",
+        "ADMIN",
+        "EMPLOYEE",
+        "SALES",
+        "MANAGER",
+        "INTERNAL",
+        "DRIVER",
+        "PARENT",
+        "USER"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},
