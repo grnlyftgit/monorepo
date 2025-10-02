@@ -10,6 +10,9 @@ interface EnvConfig {
   PORT: number;
   // Clients urls
   WEBSITE_URL: string;
+
+  // CORS
+  CORS_WHITELISTED_ORIGINS?: string[];
 }
 
 const userEnvConfig: EnvConfig = {
@@ -20,6 +23,15 @@ const userEnvConfig: EnvConfig = {
   PORT: Number(process.env.PORT)!,
 
   WEBSITE_URL: process.env.WEBSITE_URL!,
+
+  CORS_WHITELISTED_ORIGINS: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004',
+    'http://localhost:3005',
+  ],
 };
 
 export default userEnvConfig;

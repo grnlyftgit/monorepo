@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={fonts}>
+      <body className={fonts} suppressHydrationWarning>
         <SystemProvider>{children}</SystemProvider>
         <Toolbar />
       </body>

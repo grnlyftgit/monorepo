@@ -21,9 +21,11 @@ const logger = createLogger('Auth Service');
 
 const serviceName = authEnvConfig.SERVICE_NAME;
 
+// Cors setup
 app.use(
   createCors({
     NODE_ENV: authEnvConfig.NODE_ENV,
+    allowedOrigins: authEnvConfig.CORS_WHITELISTED_ORIGINS!,
   })
 );
 

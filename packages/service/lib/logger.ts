@@ -1,9 +1,9 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
-import chalk from "chalk";
-import path from "path";
-import fs from "fs";
-import config from "../config/env";
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import chalk from 'chalk';
+import path from 'path';
+import fs from 'fs';
+import config from '../config/env';
 
 const LOG_LEVELS = {
   error: 0,
@@ -22,7 +22,7 @@ const LOG_COLORS = {
 };
 
 // Hardcoded logs directory
-const logDir = path.resolve("logs");
+const logDir = path.resolve('logs');
 
 // Create logs directory if it doesn't exist
 if (!fs.existsSync(logDir)) {
@@ -54,7 +54,7 @@ class CustomFormatter {
     const metaColor = chalk.gray;
     const stackColor = chalk.red;
 
-    let logMessage = "";
+    let logMessage = '';
 
     if (this.colorize) {
       logMessage += `${timestampColor(timestamp)} `;
@@ -108,13 +108,13 @@ const customFormat = (colorize: boolean = true) => {
 };
 
 const consoleFormat = winston.format.combine(
-  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   customFormat(true)
 );
 
 const fileFormat = winston.format.combine(
-  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.json()
 );
@@ -122,10 +122,10 @@ const fileFormat = winston.format.combine(
 // Daily rotate file transport for general logs
 const dailyRotateFileTransport = new DailyRotateFile({
   filename: `${logDir}/%DATE%-results.log`,
-  datePattern: "YYYY-MM-DD",
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "14d",
+  maxSize: '20m',
+  maxFiles: '14d',
   format: fileFormat,
   level: getLogLevel(),
 });
@@ -133,21 +133,21 @@ const dailyRotateFileTransport = new DailyRotateFile({
 // Error-only logs with longer retention
 const errorRotateFileTransport = new DailyRotateFile({
   filename: `${logDir}/%DATE%-error.log`,
-  datePattern: "YYYY-MM-DD",
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "30d",
-  level: "error",
+  maxSize: '20m',
+  maxFiles: '30d',
+  level: 'error',
   format: fileFormat,
 });
 
 // Combined logs with larger file size for comprehensive logging
 const combinedRotateFileTransport = new DailyRotateFile({
   filename: `${logDir}/%DATE%-combined.log`,
-  datePattern: "YYYY-MM-DD",
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: true,
-  maxSize: "50m",
-  maxFiles: "14d",
+  maxSize: '50m',
+  maxFiles: '14d',
   format: fileFormat,
   level: getLogLevel(),
 });
@@ -169,20 +169,20 @@ const baseLogger = winston.createLogger({
   exceptionHandlers: [
     new DailyRotateFile({
       filename: `${logDir}/%DATE%-exceptions.log`,
-      datePattern: "YYYY-MM-DD",
+      datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxSize: "20m",
-      maxFiles: "30d",
+      maxSize: '20m',
+      maxFiles: '30d',
       format: fileFormat,
     }),
   ],
   rejectionHandlers: [
     new DailyRotateFile({
       filename: `${logDir}/%DATE%-rejections.log`,
-      datePattern: "YYYY-MM-DD",
+      datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxSize: "20m",
-      maxFiles: "30d",
+      maxSize: '20m',
+      maxFiles: '30d',
       format: fileFormat,
     }),
   ],
@@ -208,23 +208,23 @@ export class Logger {
   }
 
   debug(message: string, meta?: Record<string, any>): void {
-    this.log("debug", message, meta);
+    this.log('debug', message, meta);
   }
 
   info(message: string, meta?: Record<string, any>): void {
-    this.log("info", message, meta);
+    this.log('info', message, meta);
   }
 
   http(message: string, meta?: Record<string, any>): void {
-    this.log("http", message, meta);
+    this.log('http', message, meta);
   }
 
   warn(message: string, meta?: Record<string, any>): void {
-    this.log("warn", message, meta);
+    this.log('warn', message, meta);
   }
 
   error(message: string, meta?: Record<string, any>): void {
-    this.log("error", message, meta);
+    this.log('error', message, meta);
   }
 
   child(service: string): Logger {
@@ -249,10 +249,10 @@ export const createLogger = (context: string): Logger => {
 };
 
 export const requestLogger = (req: any, res: any, next: any): void => {
-  const logger = createLogger("HTTP");
+  const logger = createLogger('HTTP');
   const start = Date.now();
 
-  res.on("finish", () => {
+  res.on('finish', () => {
     const duration = Date.now() - start;
     const statusColor =
       res.statusCode >= 500
@@ -264,7 +264,7 @@ export const requestLogger = (req: any, res: any, next: any): void => {
         : chalk.green;
 
     const level =
-      res.statusCode >= 500 ? "error" : res.statusCode >= 400 ? "warn" : "http";
+      res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : 'http';
 
     logger[level](
       `${req.method} ${req.originalUrl} ${statusColor(
@@ -276,7 +276,7 @@ export const requestLogger = (req: any, res: any, next: any): void => {
         status: res.statusCode,
         duration: `${duration}ms`,
         ip: req.ip || req.connection.remoteAddress,
-        userAgent: req.get("user-agent"),
+        userAgent: req.get('user-agent'),
         userId: (req as any).user?.userId,
       }
     );
@@ -284,6 +284,5 @@ export const requestLogger = (req: any, res: any, next: any): void => {
 
   next();
 };
-
 
 export default baseLogger;

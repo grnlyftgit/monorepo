@@ -26,9 +26,11 @@ app.use(
   })
 );
 
+// Cors setup
 app.use(
   createCors({
     NODE_ENV: config.NODE_ENV,
+    allowedOrigins: config.CORS_WHITELISTED_ORIGINS!,
   })
 );
 
@@ -38,7 +40,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Apply rate limiting to all requests
 app.use(limiter);
-
 
 // cookieParser is used to parse cookies attached to the client request object.
 // compression is used to gzip responses, reducing bandwidth usage and improving performance.
@@ -67,7 +68,6 @@ app.use(
 
 (async () => {
   try {
-
     app.listen(PORT, () => {
       logger.info(`API Gateway running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV}`);

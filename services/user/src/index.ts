@@ -3,10 +3,8 @@ import dotenv from 'dotenv';
 import type { Express } from 'express';
 import userEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
-import { errorHandler , rootAccessCheck} from '@repo/service/middleware';
-import {
-  healthCheck,
-} from '@repo/service/middleware/healthcheck';
+import { errorHandler, rootAccessCheck } from '@repo/service/middleware';
+import { healthCheck } from '@repo/service/middleware/healthcheck';
 import compressionMiddleware from '@repo/service/middleware/compression';
 import cookieParserMiddleware from '@repo/service/middleware/cookie-parser';
 import createHelmetMiddleware from '@repo/service/middleware/helmet';
@@ -19,12 +17,14 @@ const app: Express = express();
 const PORT = userEnvConfig.PORT;
 const logger = createLogger(`${userEnvConfig.SERVICE_NAME} Service`);
 
-// setup middlewares
+// Cors setup
 app.use(
   createCors({
     NODE_ENV: userEnvConfig.NODE_ENV,
+    allowedOrigins: userEnvConfig.CORS_WHITELISTED_ORIGINS!,
   })
 );
+
 app.use(
   createHelmetMiddleware({
     contentSecurityPolicy: false,

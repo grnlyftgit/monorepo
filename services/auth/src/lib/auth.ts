@@ -4,7 +4,6 @@ import { neonDB } from '@repo/db-neon/src';
 import authEnvConfig from '../config/env';
 import { admin, emailOTP, openAPI, phoneNumber } from 'better-auth/plugins';
 import { siteData } from '@repo/seo/metadata';
-import config from '@repo/service/config/env';
 import { createLogger } from '@repo/service/lib/logger';
 import { generateUID } from '@repo/service/utils/private/uid-generator';
 import { generateRandomUsername } from '@repo/service/utils';
@@ -23,7 +22,7 @@ export const auth: any = betterAuth({
   telemetry: { enabled: false },
   basePath: '/',
   secret: authEnvConfig.BETTER_AUTH_SECRET,
-  trustedOrigins: config.CORS_WHITELISTED_ORIGINS,
+  trustedOrigins: authEnvConfig.CORS_WHITELISTED_ORIGINS,
   database: drizzleAdapter(neonDB, {
     provider: 'pg',
     schema,
@@ -84,10 +83,10 @@ export const auth: any = betterAuth({
     requireEmailVerification: false,
     password: {
       hash: async (password) => {
-        return await PasswordUtils.hash(password, config.HASH_SECRET);
+        return await PasswordUtils.hash(password, authEnvConfig.HASH_SECRET);
       },
       verify: async ({ password, hash }) => {
-        return await PasswordUtils.verify(password, hash, config.HASH_SECRET);
+        return await PasswordUtils.verify(password, hash, authEnvConfig.HASH_SECRET);
       },
     },
   },
