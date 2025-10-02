@@ -12,6 +12,7 @@ import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import limiter from '@repo/service/middleware/ratelimiter';
+import { verifySession } from './middleware/verify-session';
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(
   createCors({
     NODE_ENV: authEnvConfig.NODE_ENV,
     allowedOrigins: authEnvConfig.CORS_WHITELISTED_ORIGINS!,
-  })
+  }),
 );
 
 app.use(

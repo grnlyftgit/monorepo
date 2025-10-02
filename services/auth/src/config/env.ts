@@ -21,7 +21,6 @@ interface EnvConfig {
   BETTER_AUTH_URL: string;
 
   // Hash Config
-  SALT_ROUNDS: number;
   HASH_SECRET: string;
 
   CORS_WHITELISTED_ORIGINS?: string[];
@@ -41,7 +40,6 @@ const authEnvConfig: EnvConfig = {
   WEBSITE_URL: process.env.WEBSITE_URL!,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL!,
-  SALT_ROUNDS: parseInt(process.env.SALT_ROUNDS ?? '10', 10),
   HASH_SECRET: process.env.HASH_SECRET!,
   CORS_WHITELISTED_ORIGINS: [
     'http://localhost:3000',

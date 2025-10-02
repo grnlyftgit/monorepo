@@ -1,0 +1,17 @@
+meta {
+  name: update-email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{gateway}}{{auth}}/change-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "newEmail": "mondalsuman97322@gmail.com"
+  }
+}

@@ -546,6 +546,9 @@ importers:
 
   services/user:
     dependencies:
+      '@repo/auth-service':
+        specifier: workspace:*
+        version: link:../auth
       '@repo/db-neon':
         specifier: workspace:*
         version: link:../../db/neon

@@ -1,0 +1,18 @@
+meta {
+  name: verify-email-otp
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{gateway}}{{auth}}/email-otp/verify-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email":"mondalsuman97322@gmail.com",
+    "otp":"607364"
+  }
+}
