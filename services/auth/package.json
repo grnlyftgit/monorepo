@@ -8,9 +8,10 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@repo/service": "workspace:*",
     "@repo/db-neon": "workspace:*",
+    "@repo/db-aws-redis": "workspace:*",
     "@repo/seo": "workspace:*",
+    "@repo/service": "workspace:*",
     "better-auth": "^1.3.24",
     "dotenv": "^17.2.3",
     "express": "^5.1.0"

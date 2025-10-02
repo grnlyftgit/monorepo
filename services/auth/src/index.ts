@@ -13,7 +13,6 @@ import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import limiter from '@repo/service/middleware/ratelimiter';
 
-//load environment variables
 dotenv.config();
 
 const app: Express = express();
@@ -22,14 +21,12 @@ const logger = createLogger('Auth Service');
 
 const serviceName = authEnvConfig.SERVICE_NAME;
 
-// setup middlewares
 app.use(
   createCors({
     NODE_ENV: authEnvConfig.NODE_ENV,
   })
 );
 
-// Configure Helmet with proper CSP for Scalar API Reference
 app.use(
   createHelmetMiddleware({
     enableScalar: true,
@@ -45,7 +42,6 @@ app.use(cookieParserMiddleware({}));
 
 // Error handling middleware
 app.use(errorHandler);
-
 
 // Rate Limiter
 app.use(limiter);
@@ -69,10 +65,7 @@ app.get(
   })
 );
 
-
 app.all('/*splat', toNodeHandler(auth)); // Better Auth Route Handler
-
-
 
 app.listen(PORT, () => {
   logger.info(`${serviceName} service is running on port ${PORT}`);

@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { neonDB } from '@repo/db-neon/src';
 import authEnvConfig from '../config/env';
-import { emailOTP, openAPI, phoneNumber } from 'better-auth/plugins';
+import { admin, emailOTP, openAPI, phoneNumber } from 'better-auth/plugins';
 import { siteData } from '@repo/seo/metadata';
 import config from '@repo/service/config/env';
 import { createLogger } from '@repo/service/lib/logger';
@@ -11,9 +11,11 @@ import { generateRandomUsername } from '@repo/service/utils';
 import { PasswordUtils } from '@repo/service/utils/private/hash-passowrd';
 import * as schema from '@repo/db-neon/src/db/schema';
 import { passkey } from 'better-auth/plugins/passkey';
+import { redisClient } from '@repo/db-aws-redis/src';
 
 const logger = createLogger('BetterAuth');
 const isDev = authEnvConfig.NODE_ENV === 'development';
+const redis = redisClient.getClient();
 
 export const auth: any = betterAuth({
   appName: siteData.name,
@@ -26,8 +28,18 @@ export const auth: any = betterAuth({
     provider: 'pg',
     schema,
   }),
-
-  // Enable phone number login/signup with OTP
+  secondaryStorage: {
+    get: async (key) => {
+      return await redis.get(key);
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, 'EX', ttl);
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
   plugins: [
     openAPI({ path: '/docs' }),
     passkey(),
@@ -123,7 +135,6 @@ export const auth: any = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          // Use custom UID for new users
           return {
             data: {
               ...user,
