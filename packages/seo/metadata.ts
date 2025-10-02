@@ -15,7 +15,7 @@ const author: Metadata['authors'] = {
 const publisher = 'GrnLyft';
 const twitterHandle = '@grnlyft';
 const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-const productionUrl = process.env.PROJECT_PRODUCTION_URL;
+const productionUrl = 'https://grnlyft.com';
 
 export const createMetadata = ({
   title,
