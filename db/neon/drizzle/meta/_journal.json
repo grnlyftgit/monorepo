@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759330527401,
-      "tag": "0000_superb_killraven",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1759330689317,
-      "tag": "0001_milky_scarlet_spider",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1759336334949,
-      "tag": "0002_odd_william_stryker",
+      "when": 1759384899240,
+      "tag": "0000_amusing_butterfly",
       "breakpoints": true
     }
   ]

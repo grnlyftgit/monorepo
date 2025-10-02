@@ -1,3 +1,4 @@
+CREATE TYPE "public"."userRoles" AS ENUM('SUPERADMIN', 'ADMIN', 'EMPLOYEE', 'SALES', 'MANAGER', 'INTERNAL', 'DRIVER', 'PARENT', 'USER');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -12,6 +13,20 @@ CREATE TABLE "account" (
 	"password" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "passkey" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text,
+	"public_key" text NOT NULL,
+	"user_id" text NOT NULL,
+	"credential_id" text NOT NULL,
+	"counter" integer DEFAULT 0 NOT NULL,
+	"device_type" text NOT NULL,
+	"backed_up" boolean NOT NULL,
+	"transports" text,
+	"created_at" timestamp,
+	"aaguid" text
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
@@ -37,7 +52,8 @@ CREATE TABLE "user" (
 	"phone_number_verified" boolean,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "user_email_unique" UNIQUE("email")
+	CONSTRAINT "user_email_unique" UNIQUE("email"),
+	CONSTRAINT "user_phone_number_unique" UNIQUE("phone_number")
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (
@@ -50,4 +66,5 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "passkey" ADD CONSTRAINT "passkey_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
