@@ -12,6 +12,8 @@ interface EnvConfig {
   WEBSITE_URL: string;
 
   //Cookie Config
+  COOKIE_PREFIX: string;
+  COOKIE_SESSION_TOKEN_NAME:string;
   COOKIE_DOMAIN: string;
 
   //Better Auth Config
@@ -26,6 +28,9 @@ const authEnvConfig: EnvConfig = {
     ? 'production'
     : 'development') as NodeEnv,
   PORT: Number(process.env.PORT)!,
+
+  COOKIE_PREFIX:  process.env.COOKIE_PREFIX!,
+  COOKIE_SESSION_TOKEN_NAME: process.env.COOKIE_SESSION_TOKEN_NAME!,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN!,
 
   WEBSITE_URL: process.env.WEBSITE_URL!,

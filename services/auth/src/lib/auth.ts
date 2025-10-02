@@ -43,6 +43,7 @@ export const auth: any = betterAuth({
   plugins: [
     openAPI({ path: '/docs' }),
     passkey(),
+    admin(),
     phoneNumber({
       requireVerification: true,
       allowedAttempts: 5,
@@ -93,6 +94,7 @@ export const auth: any = betterAuth({
 
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 days
+    updateAge: 60 * 60 * 24, // 1 day
     cookieCache: {
       enabled: true,
       maxAge: 60 * 60 * 24, // 1 day
@@ -100,11 +102,11 @@ export const auth: any = betterAuth({
   },
 
   advanced: {
-    cookiePrefix: 'grnlyft',
+    cookiePrefix: authEnvConfig.COOKIE_PREFIX,
     disableCSRFCheck: isDev,
     cookies: {
       session_token: {
-        name: 'grnlyft.session_token',
+        name: authEnvConfig.COOKIE_SESSION_TOKEN_NAME,
       },
     },
     cookieOptions: {
@@ -152,6 +154,14 @@ export const auth: any = betterAuth({
     },
     deleteUser: {
       enabled: true,
+    },
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: false,
+        defaultValue: 'USER',
+        input: false,
+      },
     },
   },
 
