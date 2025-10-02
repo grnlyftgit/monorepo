@@ -1,5 +1,5 @@
 {
-  "id": "e134c96c-4ab8-4fcd-8613-3eef743bf978",
+  "id": "05be95a9-9061-4582-8217-3b4bdc408bc6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -340,6 +340,25 @@
         "phone_number_verified": {
           "name": "phone_number_verified",
           "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "banned": {
+          "name": "banned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "ban_reason": {
+          "name": "ban_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ban_expires": {
+          "name": "ban_expires",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
