@@ -222,12 +222,6 @@ importers:
 
   packages/service:
     dependencies:
-      '@arcjet/inspect':
-        specifier: 1.0.0-beta.12
-        version: 1.0.0-beta.12
-      '@arcjet/node':
-        specifier: 1.0.0-beta.12
-        version: 1.0.0-beta.12
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -472,6 +466,12 @@ importers:
 
   services/auth:
     dependencies:
+      '@arcjet/inspect':
+        specifier: 1.0.0-beta.12
+        version: 1.0.0-beta.12
+      '@arcjet/node':
+        specifier: 1.0.0-beta.12
+        version: 1.0.0-beta.12
       '@repo/db-aws-redis':
         specifier: workspace:*
         version: link:../../db/redis

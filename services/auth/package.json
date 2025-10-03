@@ -8,8 +8,10 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@repo/db-neon": "workspace:*",
+    "@arcjet/inspect": "1.0.0-beta.12",
+    "@arcjet/node": "1.0.0-beta.12",
     "@repo/db-aws-redis": "workspace:*",
+    "@repo/db-neon": "workspace:*",
     "@repo/seo": "workspace:*",
     "@repo/service": "workspace:*",
     "better-auth": "^1.3.24",

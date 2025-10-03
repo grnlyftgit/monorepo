@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import type { Express } from 'express';
+import type { Express, NextFunction } from 'express';
 import authEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
 import { errorHandler, rootAccessCheck } from '@repo/service/middleware';
@@ -12,7 +12,11 @@ import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import limiter from '@repo/service/middleware/ratelimiter';
-import { verifySession } from './middleware/verify-session';
+import aj, {
+  arcjetEmailValidationMiddleware,
+  arcjetMiddleware,
+} from './config/arcjet';
+import { isSpoofedBot } from '@arcjet/inspect';
 
 dotenv.config();
 
@@ -27,7 +31,7 @@ app.use(
   createCors({
     NODE_ENV: authEnvConfig.NODE_ENV,
     allowedOrigins: authEnvConfig.CORS_WHITELISTED_ORIGINS!,
-  }),
+  })
 );
 
 app.use(
@@ -43,11 +47,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(compressionMiddleware);
 app.use(cookieParserMiddleware({}));
 
+// Arcjet Middleware
+app.use(arcjetMiddleware);
 // Error handling middleware
 app.use(errorHandler);
 
 // Rate Limiter
-app.use(limiter);
+// app.use(limiter);
 
 // API routes
 app.get(
@@ -68,7 +74,18 @@ app.get(
   })
 );
 
-app.all('/*splat', toNodeHandler(auth)); // Better Auth Route Handler
+app.all('/*splat', async (req, res, next) => {
+  if (req.path === '/sign-up' || req.path.includes('/sign-up')) {
+    await arcjetEmailValidationMiddleware(req, res, (err) => {
+      if (err) return next(err);
+      toNodeHandler(auth)(req, res);
+    });
+
+    return;
+  } else {
+    return toNodeHandler(auth)(req, res);
+  }
+});
 
 app.listen(PORT, () => {
   logger.info(`${serviceName} service is running on port ${PORT}`);

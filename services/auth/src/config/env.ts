@@ -20,6 +20,10 @@ interface EnvConfig {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
 
+    // Arcjet Config
+  ARCJET_KEY: string;
+ARCJET_ENV: string;
+
   // Hash Config
   HASH_SECRET: string;
 
@@ -37,6 +41,8 @@ const authEnvConfig: EnvConfig = {
   COOKIE_SESSION_TOKEN_NAME: process.env.COOKIE_SESSION_TOKEN_NAME!,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN!,
 
+  ARCJET_KEY: process.env.ARCJET_KEY!,
+  ARCJET_ENV: process.env.ARCJET_ENV!,
   WEBSITE_URL: process.env.WEBSITE_URL!,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL!,
