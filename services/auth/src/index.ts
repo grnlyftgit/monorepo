@@ -1,6 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import type { Express, NextFunction } from 'express';
+import type { Express } from 'express';
 import authEnvConfig from './config/env';
 import { createLogger } from '@repo/service/lib/logger';
 import { errorHandler, rootAccessCheck } from '@repo/service/middleware';
@@ -11,14 +10,11 @@ import { createCors } from '@repo/service/config/cors';
 import createHelmetMiddleware from '@repo/service/middleware/helmet';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
-import limiter from '@repo/service/middleware/ratelimiter';
-import aj, {
+import {
   arcjetEmailValidationMiddleware,
   arcjetMiddleware,
 } from './config/arcjet';
-import { isSpoofedBot } from '@arcjet/inspect';
 
-dotenv.config();
 
 const app: Express = express();
 const PORT = authEnvConfig.PORT;
@@ -51,9 +47,6 @@ app.use(cookieParserMiddleware({}));
 app.use(arcjetMiddleware);
 // Error handling middleware
 app.use(errorHandler);
-
-// Rate Limiter
-// app.use(limiter);
 
 // API routes
 app.get(

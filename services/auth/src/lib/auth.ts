@@ -51,6 +51,13 @@ export const auth: any = betterAuth({
       await redis.del(key);
     },
   },
+  socialProviders: {
+    google: {
+      prompt: 'select_account',
+      clientId: authEnvConfig.GOOGLE_CLIENT_ID,
+      clientSecret: authEnvConfig.GOOGLE_CLIENT_SECRET,
+    },
+  },
   plugins: [
     openAPI({ path: '/docs' }),
     passkey(),
