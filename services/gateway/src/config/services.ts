@@ -32,13 +32,6 @@ export const SERVICE_DEFINITIONS = {
     servicePath: '/',
     port: 6001,
   },
-  USER: {
-    key: 'user',
-    displayName: 'User Service',
-    proxyPath: '/api/user',
-    servicePath: '/',
-    port: 6002,
-  },
   // Add more services here...
 } as const;
 
@@ -133,10 +126,6 @@ export const servicesConfig: ServicesConfig = {
     SERVICE_DEFINITIONS.AUTH,
     config.AUTH_SERVICE_URL
   ),
-  [SERVICE_DEFINITIONS.USER.key]: createServiceConfig(
-    SERVICE_DEFINITIONS.USER,
-    config.USER_SERVICE_URL
-  ),
 } as const;
 
 // ============================================
@@ -196,7 +185,6 @@ export const getServiceUrl = (
 
 export const ServiceNames = {
   AUTH: SERVICE_DEFINITIONS.AUTH.key,
-  USER: SERVICE_DEFINITIONS.USER.key,
 } as const;
 
 export type ServiceName = (typeof ServiceNames)[keyof typeof ServiceNames];
