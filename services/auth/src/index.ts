@@ -15,7 +15,6 @@ import {
   arcjetMiddleware,
 } from './config/arcjet';
 
-
 const app: Express = express();
 const PORT = authEnvConfig.PORT;
 const logger = createLogger('Auth Service');

@@ -1,0 +1,11 @@
+meta {
+  name: send-test-email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{gateway}}{{auth}}/send-email
+  body: none
+  auth: none
+}

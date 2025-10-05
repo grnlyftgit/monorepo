@@ -66,13 +66,6 @@ const buildServiceUrl = (host: string | undefined, port: number): string => {
   return `${protocol}://localhost:${port}`;
 };
 
-const buildServiceProxyUrl = (
-  gatewayPath: string,
-  path: string = ''
-): string => {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${gatewayPath}${cleanPath}`;
-};
 
 const validateServiceConfig = (config: ServiceConfig): void => {
   const errors: string[] = [];
